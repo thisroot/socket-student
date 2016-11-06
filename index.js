@@ -1,8 +1,11 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var dbm = require('./js/dbmodels.js');
 
-require('./js/dbmodels.js');
+ dbm.Sync(function () {
+            global.cryptkey = dbm.asyncGetRegistry.sync(null, 'module_crypt_key');  
+ });
 
 //// sending to sender-client only
 // отправк только отправителю
@@ -31,8 +34,6 @@ require('./js/dbmodels.js');
 //// sending to individual socketid
 //socket.broadcast.to(socketid).emit('message', 'for your eyes only');
 
-
-
 io.on('connection', function(socket){
     // change in structure of item
 
@@ -42,7 +43,7 @@ io.on('connection', function(socket){
       console.log(data);
       if(data.action === 'delete-item') {}
       else {
-      global.LectureState.upsert({
+      dbm.LectureState.upsert({
                     id_lecture: data.id_block,
                     state_header: JSON.stringify([data.id_owner,data.id_user]),
                     state_items: JSON.stringify([data.id_item])}).then(function () {});
@@ -53,14 +54,16 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket){
   socket.on('get-struct message', function(data){
-      console.log(data);
-      
-      global.Decode('sZ5gz9EBe959XKgnsdEwNN7QLAKK6vnxQMnhEuKDT0g').then(function(result){
-        global.decoded = result;
-      });
-      console.log(global.decoded);
-
-     // get saved structure item
+      // в синхронной области декодируем запрошенные значения.
+        dbm.Sync(function () {
+            // а я куплю велосипед => лень конвертировать utf-16 в utf-8
+            // http://stackoverflow.com/questions/14403377/strange-unicode-characters-when-reading-in-file-in-node-js-app
+            data.id_block = dbm.Decode(data.id_block,global.cryptkey).split("\u0000")[0];
+            data.id_user = dbm.Decode(data.id_user,global.cryptkey).split("\u0000")[0];
+            data.id_owner = dbm.Decode(data.id_owner,global.cryptkey).split("\u0000")[0];
+        });
+        
+    // get saved structure item
     //socket.join(data.id_block);
     // sending to sender client
     socket.emit('get-struct message', data);
