@@ -9,5 +9,15 @@
     "nan": "^2.4.0",
     "sequelize": "^3.24.4",
     "socket.io": "^1.5.0"
-  }
+  },
+  "main": "bin/index.js",
+  "bin": {
+    "socket-server": "dbinit.js"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start":"nodemon bin/index.js"
+  },
+  "author": "egor mikheev",
+  "license": "ISC"
 }
