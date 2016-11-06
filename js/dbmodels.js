@@ -94,7 +94,6 @@ function asyncGetRegistry(value,callback) {
     })
 }
 
-
 module.exports.LectureState = LectureState;
 module.exports.Registry = Registry;
 module.exports.Decode = Decode;
