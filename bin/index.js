@@ -1,4 +1,4 @@
-require('sticky-socket-cluster/replace-console')();
+//require('sticky-socket-cluster/replace-console')();
 // prefixes console output with worker ids.
 var CPUCount = require("os").cpus().length;
 
@@ -38,11 +38,28 @@ function start(port) {
             // save in DB
             console.log(data);
             if (data.action === 'delete-item') {
-            } else {
-                dbm.LectureState.upsert({
+
+            }
+            else if((data.action === 'move-item')) {
+
+            }
+            else if((data.action === 'edit-name-item')) {
+
+            }
+            else {
+
+               /* dbm.LectureState.upsert({
                     id_lecture: data.id_block,
                     state_header: JSON.stringify([data.id_owner, data.id_user]),
-                    state_items: JSON.stringify([data.id_item])}).then(function () {});
+                    state_items: JSON.stringify([data.id_item])}).then(function () {}); */
+                
+                dbm.LectureBlock.update({
+                    state: JSON.stringify(data.state)
+                },{ where: {
+                                id_lecture: data.id_block,
+                                id_block: data.id_item 
+                            }
+                });
             }
             socket.broadcast.to(data.id_block).emit('struct message', data);
         });

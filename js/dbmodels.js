@@ -31,6 +31,41 @@ var LectureState = sequelize.define('student_lecture_states', {
   }
 });
 
+var LectureBlock = sequelize.define('student_lecture_blocks', {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    id_lecture: {
+        type: Sequelize.INTEGER,
+        primaryKey: true
+    },
+
+    id_block: {
+        type: Sequelize.INTEGER,
+        primaryKey: true
+    },
+    name: {
+        type: Sequelize.CHAR()
+    },
+    state: {
+        type: Sequelize.CHAR()
+    },
+    private: {
+        type: Sequelize.INTEGER
+    },
+    body: {
+        type: Sequelize.BLOB('medium')
+    },
+    date: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+    },
+}, {
+    timestamps: false
+});
+
 var Registry = sequelize.define('registry', {
     id: {
         type: Sequelize.INTEGER,
@@ -64,14 +99,6 @@ var getRegistry = function (value) {
     });
 };
 
-//var Decode = function (value) {
-//    return getRegistry('module_crypt_key').then(function (secret) {
-//        var desEcb = new MCrypt('rijndael-256', 'ecb');
-//        desEcb.open(secret);
-//        return desEcb.decrypt(new Buffer(value, 'base64')).toString();
-//    });
-//};
-
 function Decode(value,key) {
     var desEcb = new MCrypt('rijndael-256', 'ecb');
     desEcb.open(key);
@@ -95,6 +122,7 @@ function asyncGetRegistry(value,callback) {
 }
 
 module.exports.LectureState = LectureState;
+module.exports.LectureBlock = LectureBlock;
 module.exports.Registry = Registry;
 module.exports.Decode = Decode;
 module.exports.getRegistry = getRegistry;
